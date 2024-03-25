@@ -164,6 +164,7 @@ app.use("/api/user", require("./routes/userRoutes"));
 app.use("/api/post", require("./routes/postRoutes"));
 app.use("/api/script", require("./routes/scriptRoutes"));
 app.use("/api/room", require("./routes/roomRoutes"));
+app.use("/api/team", require("./routes/teamRoutes"));
 app.use(errorHandler);
 
 

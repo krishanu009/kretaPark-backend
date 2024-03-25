@@ -69,4 +69,17 @@ const updatePost = asyncHandler(async (req, res) => {
 
 });
 
-module.exports = {newPost, allPost, updatePost}
+const deleteAllPost = asyncHandler(async (req, res) => {
+    try {
+        // const post = await Contact.findById(req.params.id);
+        await Post.deleteMany();
+        res.status(200).json("deleted all post");
+      } catch (error) {
+        res.status(404);
+        throw new Error("post not found");
+      }
+
+});
+
+
+module.exports = {newPost, allPost, updatePost,deleteAllPost}

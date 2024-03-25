@@ -11,7 +11,8 @@ const postSchema = mongoose.Schema(
       required: [true, "Please let us know if its scheduled or not"],
     },
     scriptId: {
-      type: String,
+      id: String,
+      name: String
     },
     date: {
       type: Date,
