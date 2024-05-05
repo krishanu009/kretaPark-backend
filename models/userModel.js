@@ -14,10 +14,19 @@ const userSchema = mongoose.Schema({
         type: String,
 
         required: [true, "Please add the user password"]
+    },
+    teams:[
+        {
+            id: { type: String, required: true },
+        name: { type: String, required: true },
+        }
+    ],
+    lastLogin:{
+        type:String
     }
     
 }, {
-    timestamp: true,
+    timestamps: true,
 })
 
 module.exports = mongoose.model("User", userSchema);
