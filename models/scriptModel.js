@@ -5,7 +5,8 @@ const scriptSchema = mongoose.Schema(
         _id: String,
         title: String,
         data: Object,
-        active: Boolean
+        active: Boolean,
+        teamId: String
     }
     
 )

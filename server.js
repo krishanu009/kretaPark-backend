@@ -17,7 +17,7 @@ const io = require("socket.io")(3001, {
   },
 });
 
-const findOrCreateScript = async (doccumentId) => {
+const findOrCreateScript = async (doccumentId, teamId) => {
   try {
     const script = await Script.findById(doccumentId);
     if (script) {
@@ -28,6 +28,7 @@ const findOrCreateScript = async (doccumentId) => {
         title: "untitled",
         data: { ops: [{ insert: "\n" }] },
         active: false,
+        teamId
       });
       return newScript;
       // if(newScript)
@@ -70,9 +71,10 @@ let chatRoom = "";
 let allUsers = [];
 
 io.on("connection", (socket) => {
-  socket.on("get-document", async (documentId) => {
+  socket.on("get-document", async (documentId, userInfo) => {
     console.log("get-document", documentId);
-    const doccument = await findOrCreateScript(documentId);
+    //console.log("get-document", userInfo);
+    const doccument = await findOrCreateScript(documentId,userInfo.user.lastLogin);
     socket.join(documentId);
     socket.emit("load-document", doccument);
     console.log("loaded doc", doccument);

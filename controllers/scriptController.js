@@ -9,7 +9,7 @@ const Script = require("../models/scriptModel");
 const newScript = asyncHandler( async (req, res) => {
     const {title, data, active} = req.body;
 
-    if(!title || !data || !active) 
+    if(!title || !data || !active || !teamId) 
     {
         res.status(400);
         throw new Error('All the fields are mendatory');
@@ -18,7 +18,8 @@ const newScript = asyncHandler( async (req, res) => {
     const script = await Script.create({
         title,
         data,
-        active
+        active,
+        teamId
     });
 
     if(script)
@@ -39,7 +40,7 @@ const newScript = asyncHandler( async (req, res) => {
 const findOrCreateScript = asyncHandler( async (req, res) => {
     const {_id, title, data, active} = req.body;
 
-    if(!_id || !title || !data || !active) 
+    if(!_id || !title || !data || !active || !teamId) 
     {
         res.status(400);
         throw new Error('All the fields are mendatory');
@@ -56,7 +57,8 @@ const findOrCreateScript = asyncHandler( async (req, res) => {
                 _id,
                 title,
                 data,
-                active
+                active,
+                teamId
             });
         
             if(newScript)
@@ -105,6 +107,32 @@ const allScript =  asyncHandler(async (req, res) => {
     res.status(200).json(allScript);
 });
 
+//@desc get all script by team Id
+//@route POST /api/script/all/:teamId
+//@access private
+const allPostByTeamID = asyncHandler(async (req, res) => {
+    const { teamId } = req.params;
+    if (!teamId) {
+      res.status(400);
+      throw new Error("All the fileds are mendatory!");
+    }
+    try {
+      const scripts = await Script.find({ teamId });
+  
+    //   if (!scripts) {
+    //     return res
+    //       .status(404)
+    //       .json({ message: "No script found for the given company ID" });
+    //   }
+  
+      res.status(200).json(scripts);
+    } catch (error) {
+      console.error("Error fetching scripts:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+   
+  });
+
 //@desc update a post 
 //@route POST /api/script/update/:id
 //@access private 
@@ -141,4 +169,4 @@ const deleteContact = asyncHandler(async  (req, res) => {
     
   
   });
- module.exports = {newScript, allScript, updateScript, findOrCreateScript, deleteContact}
+ module.exports = {newScript, allScript, updateScript, findOrCreateScript, deleteContact, allPostByTeamID }
