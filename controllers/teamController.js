@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Team = require("../models/teamModel");
-
+const User = require("../models/userModel");
 
 //@desc Create a new Team
 //@Route POST /api/team/new
@@ -153,28 +153,35 @@ const getTeamMembers = asyncHandler( async(req,res) => {
 //@route PATCH /api/teams/:teamId/members/add
 //@access private
 const addMemberToTeam = asyncHandler(async (req, res) => {
-    const { teamId } = req.params;
-    const { memberId, memberName } = req.body;
+    // const { teamId } = req.params;
+    const { email,teamId } = req.body;
 
-    if (!memberId || !memberName) {
+    if (!email || !teamId) {
         res.status(400);
         throw new Error("Member ID and name are required");
     }
 
     const team = await Team.findById(teamId);
     if (!team) {
-        res.status(404);
-        throw new Error("Team not found");
+        res.status(404).json({ error: "Team not available!" });
+        return;
     }
+    //check if user is registered
+    const userAvailable = await User.findOne({email});
+  if(!userAvailable)
+  {
+    res.status(404).json({ error: "User Not Available!" });
+    return;
+  }
 
     // Check if member already exists in the team
-    const isMemberExists = team.members.some(member => member.id === memberId);
+    const isMemberExists = team.members.some(member => member.id === userAvailable.id);
     if (isMemberExists) {
-        res.status(400);
-        throw new Error("Member already exists in the team");
+        res.status(404).json({ error: "User already exist in the team!" });
+        return;
     }
-
-    team.members.push({ id: memberId, name: memberName });
+    console.log("user available",userAvailable);
+    team.members.push({ id: userAvailable.id, name: userAvailable.userName });
     await team.save();
 
     res.status(200).json({ message: "Member added successfully", team });
