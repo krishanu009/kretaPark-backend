@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
+const Team = require("../models/teamModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 //@desc login user
@@ -66,6 +67,44 @@ const registerUser = asyncHandler(async (req, res) => {
     });
     console.log("user ", user);
     if (user) {
+
+      try{
+
+        let title = user.userName + "'s team";
+        let members = [{ id: user.id, name: user.userName }];
+        //create a team
+        let team = await Team.create({
+          title,
+          members,
+        });
+  
+        console.log("team",team);
+        if (team) {
+          // res.status(201).json({
+          //     message: "Team created successfully",
+          //     team: {
+          //         _id: team._id,
+          //         title: team.title, // Ensure title is included here
+          //         members: team.members,
+          //         createdAt: team.createdAt,
+          //         updatedAt: team.updatedAt
+          //     }
+          // });
+  
+          user.lastLogin = team._id;
+          await user.save();
+        }
+
+      }
+      catch(e)
+      {
+         console.log("error in team creation",e);
+         res.status(404);
+         throw new Error("Error in registering user!")
+      }
+     
+      // update last login
+
       const accesToken = jwt.sign(
         {
           user: {
@@ -80,15 +119,13 @@ const registerUser = asyncHandler(async (req, res) => {
         }
       );
 
-      res
-        .status(200)
-        .json({
-          _id: user.id,
-          email: user.email,
-          accesToken,
-          teams: user.teams,
-          lastLogin: user.lastLogin,
-        });
+      res.status(200).json({
+        _id: user.id,
+        email: user.email,
+        accesToken,
+        teams: user.teams,
+        lastLogin: user.lastLogin,
+      });
     } else {
       res.status(400);
       throw new Error("User data is not valid!");
